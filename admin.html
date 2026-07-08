@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Poke Fish</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #1a1a2e; color: #fff; padding: 20px; text-align: center; }
+        h1 { color: #FFD966; }
+        input { padding: 10px; margin: 5px; border-radius: 5px; border: none; }
+        button { padding: 10px 20px; margin: 5px; border-radius: 5px; border: none; background: #FFD966; color: #1a1a2e; cursor: pointer; font-weight: bold; }
+        button:hover { background: #e6b800; }
+        #panel { display: none; max-width: 800px; margin: 20px auto; }
+        ul { list-style: none; padding: 0; }
+        li { background: #2a2a4e; margin: 10px 0; padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        li button { margin-left: 5px; }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+    </style>
+</head>
+<body>
+    <h1>🎣 Admin - Poke Fish</h1>
+    <div id="login-area">
+        <input id="adminUser" placeholder="Usuário admin">
+        <input id="adminPass" type="password" placeholder="Senha">
+        <button onclick="loginAdmin()">Entrar</button>
+        <div id="loginMsg"></div>
+    </div>
+    <div id="panel">
+        <h2>📋 Transações Pendentes</h2>
+        <ul id="txList"></ul>
+        <div id="adminMsg"></div>
+    </div>
+
+    <script>
+        const API_URL = 'https://pokefish-backend-production.up.railway.app/api';
+
+        async function apiFetch(endpoint, options = {}) {
+            const token = localStorage.getItem('admin_token');
+            const headers = {
+                'Content-Type': 'application/json',
+                ...(token ? { 'Authorization': 'Bearer ' + token } : {})
+            };
+            const res = await fetch(`${API_URL}${endpoint}`, { ...options, headers });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Erro');
+            return data;
+        }
+
+        async function loginAdmin() {
+            const user = document.getElementById('adminUser').value.trim();
+            const pass = document.getElementById('adminPass').value.trim();
+            if (!user || !pass) { document.getElementById('loginMsg').textContent = 'Preencha os campos'; return; }
+            try {
+                const data = await apiFetch('/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ username: user, password: pass })
+                });
+                localStorage.setItem('admin_token', data.token);
+                document.getElementById('login-area').style.display = 'none';
+                document.getElementById('panel').style.display = 'block';
+                loadTransactions();
+            } catch (e) {
+                document.getElementById('loginMsg').textContent = e.message;
+            }
+        }
+
+        async function loadTransactions() {
+            try {
+                const txs = await apiFetch('/admin/transactions');
+                const list = document.getElementById('txList');
+                list.innerHTML = '';
+                if (txs.length === 0) {
+                    list.innerHTML = '<li style="justify-content:center;">Nenhuma transação pendente</li>';
+                    return;
+                }
+                txs.forEach(tx => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <span>
+                            <strong>${tx.username}</strong> - ${tx.type} - ${tx.amountCoins} moedas ($${tx.amountUSD})<br>
+                            ${tx.txid ? 'TXID: ' + tx.txid : 'Wallet: ' + tx.wallet}
+                        </span>
+                        <span>
+                            <button onclick="approve('${tx._id}')">✅ Aprovar</button>
+                            <button onclick="reject('${tx._id}')">❌ Rejeitar</button>
+                        </span>
+                    `;
+                    list.appendChild(li);
+                });
+                document.getElementById('adminMsg').textContent = '';
+            } catch (e) {
+                document.getElementById('adminMsg').textContent = 'Erro ao carregar: ' + e.message;
+            }
+        }
+
+        async function approve(id) {
+            try {
+                await apiFetch('/admin/approve', {
+                    method: 'POST',
+                    body: JSON.stringify({ txId: id, action: 'approved' })
+                });
+                loadTransactions();
+            } catch (e) {
+                document.getElementById('adminMsg').textContent = 'Erro: ' + e.message;
+            }
+        }
+
+        async function reject(id) {
+            try {
+                await apiFetch('/admin/approve', {
+                    method: 'POST',
+                    body: JSON.stringify({ txId: id, action: 'rejected' })
+                });
+                loadTransactions();
+            } catch (e) {
+                document.getElementById('adminMsg').textContent = 'Erro: ' + e.message;
+            }
+        }
+
+        // Verifica se já está logado
+        if (localStorage.getItem('admin_token')) {
+            document.getElementById('login-area').style.display = 'none';
+            document.getElementById('panel').style.display = 'block';
+            loadTransactions();
+        }
+    </script>
+</body>
+</html>
