@@ -662,7 +662,10 @@
         }
         const soundManager = new SoundManager();
         document.getElementById('sound-toggle-btn').addEventListener('click', () => { soundManager.toggleSound(); soundManager.playButtonClick(); });
-        document.addEventListener('click', (e) => { if (e.target.tagName === 'BUTTON') soundManager.playButtonClick(); });
+
+        // ========== CAPTURA CÓDIGO DE INDICAÇÃO DA URL ==========
+        const urlParams = new URLSearchParams(window.location.search);
+        const autoReferral = urlParams.get('ref') || ''; // ex: ?ref=joao123
 
         // ========== AUTENTICAÇÃO E API ==========
         let isLoggedIn = false, currentUsername = '';
@@ -887,6 +890,7 @@
         }
 
         function unequipRod() {
+            // Aviso: desequipar ainda não chama o backend (endpoint /api/user/unequip-rod inexistente)
             playerData.equippedRod = null;
             playerData.maxEnergy = 0;
             playerData.currentEnergy = 0;
@@ -2284,18 +2288,6 @@
             }
         });
 
-        // ========== AUTO-LOGIN ==========
-        const token = getToken();
-        if (token) {
-            apiFetch('/user/profile').then(data => {
-                document.getElementById('auth-msg').textContent = 'Entrando automaticamente...';
-                document.getElementById('auth-msg').className = 'success';
-                setTimeout(() => enableGame(data.username), 600);
-            }).catch(() => {
-                removeToken();
-            });
-        }
-
         // ========== EVENTO DO BOTÃO START ==========
         let gameStarted = false;
         document.getElementById('press-start-btn').addEventListener('click', () => {
@@ -2307,16 +2299,21 @@
                 const el = document.getElementById('start-screen');
                 if (el) el.remove();
             }, 500);
-            document.getElementById('cast-button').disabled = true;
-            document.getElementById('cast-button').textContent = '🔐 Faça login';
-            document.getElementById('shop-button').style.pointerEvents = 'none';
-            document.getElementById('add-coins-btn').style.pointerEvents = 'none';
-            document.getElementById('logout-btn').style.display = 'none';
             document.getElementById('auth-overlay').classList.add('show');
             document.getElementById('login-form').style.display = 'block';
             document.getElementById('register-form').style.display = 'none';
             document.getElementById('auth-msg').textContent = '';
-            // Se já tiver token, tenta auto-login
+
+            // Se veio de link de indicação, já abre no registro
+            if (autoReferral) {
+                document.getElementById('login-form').style.display = 'none';
+                document.getElementById('register-form').style.display = 'block';
+                document.getElementById('reg-referral').value = autoReferral;
+                document.getElementById('reg-referral').readOnly = true; // opcional
+            }
+
+            // Tenta auto-login (se token existir)
+            const token = getToken();
             if (token) {
                 apiFetch('/user/profile').then(data => {
                     document.getElementById('auth-msg').textContent = 'Entrando automaticamente...';
@@ -2329,7 +2326,55 @@
             animate(0);
         });
 
-        console.log('🎣 Poke Fish NFT com backend!');
+        // ========== EVENTOS DOS BOTÕES DO HUD (LOJA, INDICAR, SAIR, etc.) ==========
+        document.getElementById('shop-button').addEventListener('click', () => {
+            if (!isLoggedIn) return;
+            document.getElementById('shop-overlay').classList.add('show');
+            updateUI();
+        });
+        document.getElementById('close-shop').addEventListener('click', () => {
+            document.getElementById('shop-overlay').classList.remove('show');
+        });
+
+        document.getElementById('referral-btn').addEventListener('click', () => {
+            if (!isLoggedIn) return;
+            const link = `${window.location.origin}?ref=${currentUsername}`;
+            document.getElementById('referral-code-display').textContent = link;
+            document.getElementById('referral-overlay').classList.add('show');
+        });
+        document.getElementById('close-referral').addEventListener('click', () => {
+            document.getElementById('referral-overlay').classList.remove('show');
+        });
+
+        document.getElementById('add-coins-btn').addEventListener('click', () => {
+            if (!isLoggedIn) return;
+            document.getElementById('coins-overlay').classList.add('show');
+            document.getElementById('coins-balance').textContent = playerData.coins;
+        });
+        document.getElementById('close-coins').addEventListener('click', () => {
+            document.getElementById('coins-overlay').classList.remove('show');
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.removeItem('jwt_token');
+            window.location.reload();
+        });
+
+        // Copiar link de indicação
+        document.getElementById('copy-referral-btn').addEventListener('click', () => {
+            const text = document.getElementById('referral-code-display').textContent;
+            navigator.clipboard.writeText(text).then(() => alert('Link copiado!')).catch(() => alert('Erro ao copiar'));
+        });
+
+        // Fechar modais de depósito e saque (já devem ter listeners, mas garantimos)
+        document.getElementById('close-crypto').addEventListener('click', () => {
+            document.getElementById('crypto-modal').classList.remove('show');
+        });
+        document.getElementById('close-withdraw').addEventListener('click', () => {
+            document.getElementById('withdraw-modal').classList.remove('show');
+        });
+
+        console.log('🎣 Poke Fish NFT - Todas as funcionalidades ativas!');
     </script>
 </body>
 </html>
