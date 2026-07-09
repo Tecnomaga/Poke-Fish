@@ -6,7 +6,6 @@
     <title>Poke Fish – Jogo de Pesca NFT</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        /* ========== CSS COMPLETO (inalterado) ========== */
         :root { --bg: #87CEEB; --gold: #FFD966; --gold-dark: #3A2E1C; --border-color: #5C3E2C; }
         * { margin: 0; box-sizing: border-box; }
         body { margin: 0; overflow: hidden; font-family: 'Press Start 2P', cursive; background-color: var(--bg); user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; cursor: default; touch-action: manipulation; }
@@ -133,7 +132,7 @@
         #pokemon-stars { font-size: 28px; margin-top: 4px; letter-spacing: 4px; }
 
         #referral-stats-list { list-style: none; padding: 0; margin-top: 15px; }
-        #referral-stats-list li { background: rgba(255,215,100,0.05); border: 1px solid var(--gold); border-radius: 8px; padding: 8px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 10px; }
+        #referral-stats-list li { background: rgba(255,215,100,0.05); border: 1px solid var(--gold); border-radius: 8px; padding: 8px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: #eee; }
         #referral-stats-list li span:first-child { color: #FFD966; }
         #referral-stats-list li span:last-child { color: #4CAF50; }
 
@@ -424,7 +423,7 @@
         let isLoggedIn = false, currentUsername = '';
         let playerData = { coins: 0, ownedRods: [], equippedRod: null, currentEnergy: 0, maxEnergy: 0 };
 
-        let authToken = null;   // token em memória
+        let authToken = null;
 
         function getToken() {
             if (authToken) return authToken;
@@ -441,7 +440,7 @@
             if (remember) {
                 localStorage.setItem('jwt_token', token);
             } else {
-                localStorage.removeItem('jwt_token'); // garante que não fique salvo
+                localStorage.removeItem('jwt_token');
             }
         }
 
@@ -628,6 +627,8 @@
         const POWER_METER_SPEED = 0.03;
         let catchMeterValue = 0, catchMeterDirection = 1, catchMeterSpeed = 0.02;
         let fishingCooldown = false;
+        let isCasting = false;   // proteção contra clique duplo
+
         let projectileOrigin = new THREE.Vector3(), projectileTarget = new THREE.Vector3(), projectileProgress = 0, projectileDuration = 1.2, projectileElapsed = 0;
         let bobberLanded = false, bobberWorldPos = new THREE.Vector3();
         let currentCatchPokemon = null;
@@ -661,12 +662,15 @@
         }
 
         async function startPowerMeter() {
-            if (gameState !== GameState.IDLE || fishingCooldown || !isLoggedIn) return;
+            if (isCasting || fishingCooldown || gameState !== GameState.IDLE || !isLoggedIn) return;
             const rod = getEquippedRod();
             if (!rod) { showMessage('🎣 Você precisa de uma vara! Compre na loja.', 2500); return; }
             if (playerData.currentEnergy <= 0) { showMessage('⚡ Sem energia!', 2500); return; }
 
-            // Gasta energia no servidor antes de começar
+            isCasting = true;
+            castButton.disabled = true;
+            castButton.textContent = '⏳ Verificando...';
+
             try {
                 const data = await apiFetch('/user/spend-energy', { method: 'POST' });
                 playerData.currentEnergy = data.currentEnergy;
@@ -677,11 +681,18 @@
                 powerMeterDirection = 1;
                 powerMeterContainer.style.display = 'block';
                 castButton.textContent = '🎯 PARAR!';
+                castButton.disabled = false;
                 castButton.style.background = '#ff8844';
                 powerMeterFill.style.width = '0%';
                 document.getElementById('pokemon-overlay').classList.remove('show');
             } catch (e) {
                 showMessage('⚡ ' + (e.message || 'Erro ao gastar energia'), 2000);
+                gameState = GameState.IDLE;
+                castButton.textContent = '🎣 Jogar Anzol';
+                castButton.disabled = false;
+                castButton.style.background = '#FFD966';
+            } finally {
+                isCasting = false;
             }
         }
 
@@ -1562,4 +1573,4 @@
         console.log('🎣 Poke Fish NFT - Completo e funcional!');
     </script>
 </body>
-    </html>
+</html>
