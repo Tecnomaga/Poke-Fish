@@ -529,11 +529,6 @@
 
         function getEquippedRod() { return playerData.equippedRod ? RODS.find(r => r.id === playerData.equippedRod) : null; }
 
-        function useEnergy(amount = 1) {
-            if (playerData.currentEnergy >= amount) { playerData.currentEnergy -= amount; updateUI(); return true; }
-            return false;
-        }
-
         function enableGame(username) {
             isLoggedIn = true; currentUsername = username;
             document.getElementById('auth-overlay').classList.remove('show');
@@ -627,7 +622,8 @@
         const POWER_METER_SPEED = 0.03;
         let catchMeterValue = 0, catchMeterDirection = 1, catchMeterSpeed = 0.02;
         let fishingCooldown = false;
-        let isCasting = false;   // proteção contra clique duplo
+        let isCasting = false;
+        let isStopping = false;
 
         let projectileOrigin = new THREE.Vector3(), projectileTarget = new THREE.Vector3(), projectileProgress = 0, projectileDuration = 1.2, projectileElapsed = 0;
         let bobberLanded = false, bobberWorldPos = new THREE.Vector3();
@@ -662,7 +658,7 @@
         }
 
         async function startPowerMeter() {
-            if (isCasting || fishingCooldown || gameState !== GameState.IDLE || !isLoggedIn) return;
+            if (isCasting || fishingCooldown || isStopping || gameState !== GameState.IDLE || !isLoggedIn) return;
             const rod = getEquippedRod();
             if (!rod) { showMessage('🎣 Você precisa de uma vara! Compre na loja.', 2500); return; }
             if (playerData.currentEnergy <= 0) { showMessage('⚡ Sem energia!', 2500); return; }
@@ -675,6 +671,8 @@
                 const data = await apiFetch('/user/spend-energy', { method: 'POST' });
                 playerData.currentEnergy = data.currentEnergy;
                 updateUI();
+
+                if (gameState !== GameState.IDLE) return;
 
                 gameState = GameState.POWER_METER;
                 powerMeterValue = 0;
@@ -697,15 +695,20 @@
         }
 
         function stopPowerMeter() {
-            if (gameState !== GameState.POWER_METER) return;
+            if (isStopping || gameState !== GameState.POWER_METER) return;
+
+            isStopping = true;
+            castButton.disabled = true;
+
             castPower = powerMeterValue;
             gameState = GameState.CASTING;
             powerMeterContainer.style.display = 'none';
             castButton.textContent = '🎣 Lançando...';
-            castButton.disabled = true;
             castButton.style.background = '#888';
             soundManager.playSfx('cast');
             startCastAnimation(castPower);
+
+            isStopping = false;
         }
 
         function buildCatchMeterSegments() {
@@ -794,7 +797,7 @@
 
         castButton.addEventListener('click', () => {
             if (!gameStarted || !isLoggedIn) return;
-            if (fishingCooldown && gameState === GameState.COOLDOWN) return;
+            if (fishingCooldown || isCasting || isStopping) return;
             switch (gameState) {
                 case GameState.IDLE: startPowerMeter(); break;
                 case GameState.POWER_METER: stopPowerMeter(); break;
