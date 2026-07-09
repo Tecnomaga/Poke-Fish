@@ -6,6 +6,7 @@
     <title>Poke Fish – Jogo de Pesca NFT</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
+        /* ========== CSS COMPLETO (inalterado) ========== */
         :root { --bg: #87CEEB; --gold: #FFD966; --gold-dark: #3A2E1C; --border-color: #5C3E2C; }
         * { margin: 0; box-sizing: border-box; }
         body { margin: 0; overflow: hidden; font-family: 'Press Start 2P', cursive; background-color: var(--bg); user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; cursor: default; touch-action: manipulation; }
@@ -43,10 +44,10 @@
         #auth-msg.success { color: #51cf66; }
 
         #hud { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
-        #top-bar { position: absolute; top: 15px; left: 15px; right: 15px; pointer-events: auto; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .stats-row, .actions-row { display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; width: 100%; }
-
-        .stat-box { background: rgba(0,0,0,0.75); border: 2px solid var(--gold); border-radius: 12px; padding: 8px 14px; color: var(--gold); font-size: 10px; text-shadow: 2px 2px 0 #3A2E1C; text-align: center; min-width: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(2px); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        #top-bar { position: absolute; top: 15px; left: 15px; right: 15px; pointer-events: auto; display: flex; flex-direction: row; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+        .stats-group { display: flex; flex-direction: row; gap: 10px; flex-wrap: wrap; justify-content: flex-start; flex: 1 1 auto; }
+        .actions-group { display: flex; flex-direction: row; gap: 10px; flex-wrap: wrap; justify-content: flex-end; flex: 0 1 auto; }
+        .stat-box { background: rgba(0,0,0,0.75); border: 2px solid var(--gold); border-radius: 12px; padding: 8px 14px; color: var(--gold); font-size: 10px; text-shadow: 2px 2px 0 #3A2E1C; text-align: center; min-width: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(2px); box-shadow: 0 4px 10px rgba(0,0,0,0.5); flex: 0 1 auto; }
         .stat-box .label { color: #ccc; font-size: 7px; margin-bottom: 4px; text-transform: uppercase; }
         .stat-box .value { font-size: 14px; color: #fff; }
         .coins-row { display: flex; align-items: center; justify-content: center; gap: 6px; }
@@ -57,7 +58,7 @@
         #energy-bar-fill { height: 100%; background: linear-gradient(90deg, #44ff44, #88ff44); border-radius: 3px; transition: width 0.3s ease; }
         .energy-timer { font-size: 7px; color: #aaa; margin-top: 2px; }
 
-        #shop-button, #withdraw-btn, #referral-btn, #sound-toggle-btn, #logout-btn { pointer-events: auto; background: linear-gradient(180deg, #FFD966 0%, #e6b800 100%); color: #3A2E1C; border: 3px solid #5C3E2C; border-radius: 14px; padding: 8px 10px; font-size: 8px; min-width: 60px; min-height: 55px; font-family: 'Press Start 2P', cursive; cursor: pointer; box-shadow: 0 4px 0 #4a3a2a; transition: all 0.1s ease; text-transform: uppercase; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; line-height: 1.2; text-align: center; }
+        #shop-button, #withdraw-btn, #referral-btn, #sound-toggle-btn, #logout-btn { pointer-events: auto; background: linear-gradient(180deg, #FFD966 0%, #e6b800 100%); color: #3A2E1C; border: 3px solid #5C3E2C; border-radius: 14px; padding: 8px 10px; font-size: 8px; min-width: 60px; min-height: 55px; font-family: 'Press Start 2P', cursive; cursor: pointer; box-shadow: 0 4px 0 #4a3a2a; transition: all 0.1s ease; text-transform: uppercase; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; line-height: 1.2; text-align: center; flex: 0 0 auto; }
         #shop-button span, #withdraw-btn span, #referral-btn span, #sound-toggle-btn span, #logout-btn span { display: block; text-align: center; width: 100%; font-size: 8px; }
         #logout-btn { background: linear-gradient(180deg, #cc4444 0%, #aa3333 100%); color: white; border-color: #7a2a2a; }
         #sound-toggle-btn { background: linear-gradient(180deg, #66bb6a 0%, #43a047 100%); color: #1a3a1a; border-color: #2a5a2a; }
@@ -132,21 +133,19 @@
         #pokemon-stars { font-size: 28px; margin-top: 4px; letter-spacing: 4px; }
 
         #referral-stats-list { list-style: none; padding: 0; margin-top: 15px; }
-        #referral-stats-list li { background: rgba(255,215,100,0.1); border: 1px solid var(--gold); border-radius: 8px; padding: 8px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: #ffffff; }
+        #referral-stats-list li { background: rgba(255,215,100,0.05); border: 1px solid var(--gold); border-radius: 8px; padding: 8px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 10px; }
         #referral-stats-list li span:first-child { color: #FFD966; }
-        #referral-stats-list li span:last-child { color: #4CAF50; font-weight: bold; }
+        #referral-stats-list li span:last-child { color: #4CAF50; }
 
         @media (max-width: 700px) {
-            #top-bar { gap: 6px; }
-            .stats-row, .actions-row { gap: 6px; }
+            #top-bar { flex-direction: column; align-items: center; gap: 8px; }
+            .stats-group, .actions-group { width: 100%; justify-content: center; }
             .stat-box { padding: 6px 10px; font-size: 8px; min-width: 70px; } .stat-box .value { font-size: 12px; }
             #shop-panel, #coins-panel, #crypto-panel, #withdraw-panel { padding: 12px; max-height: 80vh; }
             .shop-grid { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
             .shop-item { font-size: 8px; padding: 12px 8px; }
             #catch-meter-container { width: 92vw; height: 32px; }
             #catch-meter-indicator { width: 6px; }
-            #shop-button, #withdraw-btn, #referral-btn, #sound-toggle-btn, #logout-btn { min-width: 50px; min-height: 48px; padding: 6px 8px; }
-            #shop-button span, #withdraw-btn span, #referral-btn span, #sound-toggle-btn span, #logout-btn span { font-size: 7px; }
         }
     </style>
 </head>
@@ -203,7 +202,7 @@
 
     <div id="hud">
         <div id="top-bar">
-            <div class="stats-row">
+            <div class="stats-group">
                 <div class="stat-box">
                     <div class="label">⚡ ENERGIA</div>
                     <div class="value" id="energy-text">0/0</div>
@@ -222,7 +221,7 @@
                     </div>
                 </div>
             </div>
-            <div class="actions-row">
+            <div class="actions-group">
                 <button id="shop-button">🏪<span>Loja</span></button>
                 <button id="withdraw-btn">💸<span>Saque</span></button>
                 <button id="referral-btn">👥<span>Indicar</span></button>
@@ -425,9 +424,31 @@
         let isLoggedIn = false, currentUsername = '';
         let playerData = { coins: 0, ownedRods: [], equippedRod: null, currentEnergy: 0, maxEnergy: 0 };
 
-        function getToken() { return localStorage.getItem('jwt_token'); }
-        function setToken(token) { localStorage.setItem('jwt_token', token); }
-        function removeToken() { localStorage.removeItem('jwt_token'); }
+        let authToken = null;   // token em memória
+
+        function getToken() {
+            if (authToken) return authToken;
+            const saved = localStorage.getItem('jwt_token');
+            if (saved) {
+                authToken = saved;
+                return saved;
+            }
+            return null;
+        }
+
+        function setToken(token, remember = false) {
+            authToken = token;
+            if (remember) {
+                localStorage.setItem('jwt_token', token);
+            } else {
+                localStorage.removeItem('jwt_token'); // garante que não fique salvo
+            }
+        }
+
+        function removeToken() {
+            authToken = null;
+            localStorage.removeItem('jwt_token');
+        }
 
         async function apiFetch(endpoint, options = {}) {
             const token = getToken();
@@ -438,9 +459,9 @@
             return data;
         }
 
-        async function loginUser(username, password) {
+        async function loginUser(username, password, remember = false) {
             const data = await apiFetch('/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) });
-            setToken(data.token);
+            setToken(data.token, remember);
             return data.user;
         }
 
@@ -640,29 +661,28 @@
         }
 
         async function startPowerMeter() {
-  if (gameState !== GameState.IDLE || fishingCooldown || !isLoggedIn) return;
-  const rod = getEquippedRod();
-  if (!rod) { showMessage('🎣 Você precisa de uma vara! Compre na loja.', 2500); return; }
-  if (playerData.currentEnergy <= 0) { showMessage('⚡ Sem energia!', 2500); return; }
+            if (gameState !== GameState.IDLE || fishingCooldown || !isLoggedIn) return;
+            const rod = getEquippedRod();
+            if (!rod) { showMessage('🎣 Você precisa de uma vara! Compre na loja.', 2500); return; }
+            if (playerData.currentEnergy <= 0) { showMessage('⚡ Sem energia!', 2500); return; }
 
-  // Gasta energia no servidor antes de começar
-  try {
-    const data = await apiFetch('/user/spend-energy', { method: 'POST' });
-    playerData.currentEnergy = data.currentEnergy;
-    updateUI();
+            // Gasta energia no servidor antes de começar
+            try {
+                const data = await apiFetch('/user/spend-energy', { method: 'POST' });
+                playerData.currentEnergy = data.currentEnergy;
+                updateUI();
 
-    // Inicia o medidor de força
-    gameState = GameState.POWER_METER;
-    powerMeterValue = 0;
-    powerMeterDirection = 1;
-    powerMeterContainer.style.display = 'block';
-    castButton.textContent = '🎯 PARAR!';
-    castButton.style.background = '#ff8844';
-    powerMeterFill.style.width = '0%';
-    document.getElementById('pokemon-overlay').classList.remove('show');
-  } catch (e) {
-    showMessage('⚡ ' + (e.message || 'Erro ao gastar energia'), 2000);
-  }
+                gameState = GameState.POWER_METER;
+                powerMeterValue = 0;
+                powerMeterDirection = 1;
+                powerMeterContainer.style.display = 'block';
+                castButton.textContent = '🎯 PARAR!';
+                castButton.style.background = '#ff8844';
+                powerMeterFill.style.width = '0%';
+                document.getElementById('pokemon-overlay').classList.remove('show');
+            } catch (e) {
+                showMessage('⚡ ' + (e.message || 'Erro ao gastar energia'), 2000);
+            }
         }
 
         function stopPowerMeter() {
@@ -1407,15 +1427,23 @@
         document.getElementById('login-btn').addEventListener('click', async () => {
             const u = document.getElementById('login-username').value.trim(), p = document.getElementById('login-password').value.trim();
             if (!u || !p) { document.getElementById('auth-msg').textContent = 'Preencha todos os campos!'; return; }
-            try { const user = await loginUser(u, p); document.getElementById('auth-msg').textContent = 'Login efetuado!'; document.getElementById('auth-msg').className = 'success'; setTimeout(() => enableGame(u), 800); }
-            catch (e) { document.getElementById('auth-msg').textContent = e.message; document.getElementById('auth-msg').className = ''; }
+            const rememberMe = document.getElementById('remember-me').checked;
+            try {
+                const user = await loginUser(u, p, rememberMe);
+                document.getElementById('auth-msg').textContent = 'Login efetuado!';
+                document.getElementById('auth-msg').className = 'success';
+                setTimeout(() => enableGame(u), 800);
+            } catch (e) {
+                document.getElementById('auth-msg').textContent = e.message;
+                document.getElementById('auth-msg').className = '';
+            }
         });
         document.getElementById('register-btn').addEventListener('click', async () => {
             const u = document.getElementById('reg-username').value.trim(), p = document.getElementById('reg-password').value.trim(), c = document.getElementById('reg-confirm').value.trim(), ref = document.getElementById('reg-referral').value.trim();
             if (!u || !p || !c) { document.getElementById('auth-msg').textContent = 'Preencha todos os campos!'; return; }
             if (p !== c) { document.getElementById('auth-msg').textContent = 'Senhas não conferem!'; return; }
             if (p.length < 4) { document.getElementById('auth-msg').textContent = 'Senha muito curta!'; return; }
-            try { await registerUser(u, p, ref); document.getElementById('auth-msg').textContent = 'Conta criada!'; document.getElementById('auth-msg').className = 'success'; const user = await loginUser(u, p); setTimeout(() => enableGame(u), 800); }
+            try { await registerUser(u, p, ref); document.getElementById('auth-msg').textContent = 'Conta criada!'; document.getElementById('auth-msg').className = 'success'; const user = await loginUser(u, p, false); setTimeout(() => enableGame(u), 800); }
             catch (e) { document.getElementById('auth-msg').textContent = e.message; document.getElementById('auth-msg').className = ''; }
         });
 
@@ -1454,7 +1482,7 @@
                 if (list) {
                     list.innerHTML = '';
                     if (stats.length === 0) {
-                        list.innerHTML = '<li style="justify-content:center; color:#ffffff;">Nenhum indicado ainda.</li>';
+                        list.innerHTML = '<li style="justify-content:center;">Nenhum indicado ainda.</li>';
                     } else {
                         stats.forEach(s => {
                             const li = document.createElement('li');
