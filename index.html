@@ -210,18 +210,18 @@
     </div>
 
     <div id="event-modal">
-    <div id="event-panel">
-        <h2>☀️ Summer Event</h2>
-        <p style="font-size:12px; color:#FFD966;">11/07 - 11/08</p>
-        <img class="shiny-sprite" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/658.png" alt="Shiny Greninja">
-        <p style="font-size:14px; margin:10px 0;">⭐ Shiny Greninja 5⭐</p>
-        <div class="info">
-            <p>💰 <span class="highlight">1000 Moedas</span> = <span class="highlight">$10 USD</span></p>
-            <p class="chance">🎯 1% de chance em <span class="highlight">todas as varas</span></p>
+        <div id="event-panel">
+            <h2>☀️ Summer Event</h2>
+            <p style="font-size:12px; color:#FFD966;">11/07 - 11/08</p>
+            <img class="shiny-sprite" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/658.png" alt="Shiny Greninja">
+            <p style="font-size:14px; margin:10px 0;">⭐ Shiny Greninja 5⭐</p>
+            <div class="info">
+                <p>💰 <span class="highlight">1000 Moedas</span> = <span class="highlight">$10 USD</span></p>
+                <p class="chance">🎯 1% de chance em <span class="highlight">todas as varas</span></p>
+            </div>
+            <button id="close-event-btn">🎣 Participar!</button>
         </div>
-        <button id="close-event-btn">🎣 Participar!</button>
     </div>
-</div>
 
     <canvas id="gameCanvas"></canvas>
 
@@ -994,6 +994,14 @@
         const originalBobber = fishingRodGroup.getObjectByName('originalBobber');
         const fishingLine = fishingRodGroup.getObjectByName('fishingLine');
 
+        // ========== SHINY GRENINJA NO DECK ==========
+        const greninjaTexture = new THREE.TextureLoader().load('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/658.png');
+        const greninjaMaterial = new THREE.SpriteMaterial({ map: greninjaTexture, transparent: true });
+        const greninjaSprite = new THREE.Sprite(greninjaMaterial);
+        greninjaSprite.position.set(2.5, 0.4, -6.8);
+        greninjaSprite.scale.set(1.5, 1.5, 1);
+        scene.add(greninjaSprite);
+
         // ========== PROJÉTIL ==========
         const projectileGroup = new THREE.Group(); projectileGroup.visible = false;
         const projBobberGeo = new THREE.SphereGeometry(0.2, 12, 12); const projBobberMat = new THREE.MeshStandardMaterial({ color: 0xff3333, roughness: 0.25, metalness: 0.15, emissive: 0x440000, emissiveIntensity: 0.6 });
@@ -1300,6 +1308,8 @@
             const t = ts * 0.001;
             waterMaterial.uniforms.time.value = t;
             lavaFlowMat.uniforms.time.value = t;
+            // Flutuação do Shiny Greninja
+            greninjaSprite.position.y = 0.4 + Math.sin(t * 2) * 0.06;
             if (gameState === GameState.POWER_METER) {
                 powerMeterValue += POWER_METER_SPEED * powerMeterDirection;
                 if (powerMeterValue >= 1) { powerMeterValue = 1; powerMeterDirection = -1; }
