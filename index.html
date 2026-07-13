@@ -223,20 +223,20 @@
         </div>
     </div>
 
-    <!-- Modal de Boas-Vindas / Training Rod (CORRIGIDO) -->
+    <!-- Modal de Boas-Vindas / Training Rod (CORRIGIDO – restaurando tamanho original, melhorando a última frase) -->
     <div id="welcome-modal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);display:none;justify-content:center;align-items:center;z-index:200;pointer-events:auto;backdrop-filter:blur(5px);">
-        <div style="background:linear-gradient(145deg,#1a3a4a 0%,#0d1f2d 100%);border:4px solid #FFD966;border-radius:24px;padding:30px 25px;max-width:480px;width:90vw;text-align:center;box-shadow:0 0 60px rgba(255,215,100,0.4);font-family:'Press Start 2P',cursive;color:#fff;">
-            <h2 style="color:#FFD966;font-size:14px;margin-bottom:20px;line-height:1.6;">Bem-vindo ao Poke Fish,<br>você recebeu a Training Rod.</h2>
-            <p style="font-size:9px;line-height:2;color:#ddd;margin-bottom:15px;">
+        <div style="background:linear-gradient(145deg,#1a3a4a 0%,#0d1f2d 100%);border:4px solid #FFD966;border-radius:24px;padding:40px 30px;max-width:550px;width:90vw;text-align:center;box-shadow:0 0 60px rgba(255,215,100,0.4);font-family:'Press Start 2P',cursive;color:#fff;">
+            <h2 style="color:#FFD966;font-size:16px;margin-bottom:25px;line-height:1.6;">Bem-vindo ao Poke Fish,<br>você recebeu a Training Rod.</h2>
+            <p style="font-size:10px;line-height:2.2;color:#ddd;margin-bottom:20px;">
                 Esta é uma vara de <strong style="color:#FFD966;">demonstração</strong>.
             </p>
-            <p style="font-size:9px;line-height:2;color:#ddd;margin-bottom:15px;">
+            <p style="font-size:10px;line-height:2.2;color:#ddd;margin-bottom:20px;">
                 ✅ Capture Pokémon de <strong style="color:#FFD966;">1 a 5 estrelas</strong><br>
                 ❌ As <strong style="color:#ff6b6b;">moedas ganhas</strong> são de treinamento e <strong>não vão para o saldo</strong>
             </p>
-            <p style="font-size:8px;color:#aaa;margin-bottom:25px;">Use-a para treinar suas habilidades de pesca!</p>
-            <button id="claim-training-rod-btn" style="background:linear-gradient(180deg,#44cc44 0%,#2a8a2a 100%);color:white;border:3px solid #1a5a1a;border-radius:12px;padding:14px 20px;font-family:'Press Start 2P',cursive;font-size:11px;cursor:pointer;width:100%;">🎣 ADQUIRIR (GRÁTIS)</button>
-            <p id="welcome-error-msg" style="font-size:8px;color:#ff6b6b;margin-top:12px;min-height:14px;"></p>
+            <p style="font-size:10px;color:#aaa;margin-top:25px;margin-bottom:30px;letter-spacing:1px;">Use-a para treinar suas habilidades de pesca!</p>
+            <button id="claim-training-rod-btn" style="background:linear-gradient(180deg,#44cc44 0%,#2a8a2a 100%);color:white;border:3px solid #1a5a1a;border-radius:12px;padding:16px 20px;font-family:'Press Start 2P',cursive;font-size:12px;cursor:pointer;width:100%;">🎣 ADQUIRIR (GRÁTIS)</button>
+            <p id="welcome-error-msg" style="font-size:9px;color:#ff6b6b;margin-top:15px;min-height:16px;"></p>
         </div>
     </div>
 
@@ -690,9 +690,10 @@
                 const equipped = playerData.equippedRod === rod.id;
                 const div = document.createElement('div');
                 div.className = `shop-item ${owned ? 'owned' : ''} ${equipped ? 'equipped' : ''}`;
+                // Nome da vara com a cor específica, igual ao HUD
                 div.innerHTML = `
                     <div style="font-size:28px;">🎣</div>
-                    <div class="rarity-${rod.rarity}" style="font-size:11px; margin:6px 0;">${rod.name.toUpperCase()}</div>
+                    <div style="color:${rod.color}; font-size:11px; margin:6px 0;">${rod.name.toUpperCase()}</div>
                     <div class="description">${rod.desc}</div>
                     <div class="energy-info">⚡ ${rod.energy === 9999 ? 'Ilimitada' : rod.energy + ' Energia/dia'}</div>
                     <div class="potential-info">🌟 Potencial até ${rod.maxStars}🌟</div>
@@ -726,7 +727,7 @@
             m._t = setTimeout(() => { m.style.display = 'none'; }, dur);
         }
 
-        // ========== MODAL DE BOAS-VINDAS (CORRIGIDO) ==========
+        // ========== MODAL DE BOAS-VINDAS ==========
         function showWelcomeModal() {
             if (!playerData.ownedRods.includes('training_rod')) {
                 document.getElementById('welcome-modal').style.display = 'flex';
