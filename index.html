@@ -223,18 +223,19 @@
         </div>
     </div>
 
+    <!-- Modal de Boas-Vindas / Training Rod (CORRIGIDO) -->
     <div id="welcome-modal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);display:none;justify-content:center;align-items:center;z-index:200;pointer-events:auto;backdrop-filter:blur(5px);">
-        <div style="background:linear-gradient(145deg,#1a3a4a 0%,#0d1f2d 100%);border:4px solid #FFD966;border-radius:24px;padding:30px;max-width:500px;width:90vw;text-align:center;box-shadow:0 0 60px rgba(255,215,100,0.4);font-family:'Press Start 2P',cursive;color:#fff;">
-            <h2 style="color:#FFD966;font-size:16px;margin-bottom:15px;">Bem-vindo, você recebeu a Training Rod.</h2>
-            <p style="font-size:10px;line-height:1.8;color:#ddd;">
+        <div style="background:linear-gradient(145deg,#1a3a4a 0%,#0d1f2d 100%);border:4px solid #FFD966;border-radius:24px;padding:40px 30px;max-width:550px;width:90vw;text-align:center;box-shadow:0 0 60px rgba(255,215,100,0.4);font-family:'Press Start 2P',cursive;color:#fff;">
+            <h2 style="color:#FFD966;font-size:16px;margin-bottom:25px;line-height:1.6;">Bem-vindo ao Poke Fish,<br>você recebeu a Training Rod.</h2>
+            <p style="font-size:10px;line-height:2.2;color:#ddd;margin-bottom:20px;">
                 Esta é uma vara de <strong style="color:#FFD966;">demonstração</strong>.
             </p>
-            <p style="font-size:10px;line-height:1.8;color:#ddd;">
+            <p style="font-size:10px;line-height:2.2;color:#ddd;margin-bottom:20px;">
                 ✅ Capture Pokémon de <strong style="color:#FFD966;">1 a 5 estrelas</strong><br>
                 ❌ As <strong style="color:#ff6b6b;">moedas ganhas</strong> são de treinamento e <strong>não vão para o saldo</strong>
             </p>
-            <p style="font-size:9px;color:#aaa;">Use-a para aprender o jogo sem riscos!</p>
-            <button id="claim-training-rod-btn" style="background:linear-gradient(180deg,#44cc44 0%,#2a8a2a 100%);color:white;border:3px solid #1a5a1a;border-radius:12px;padding:14px 20px;font-family:'Press Start 2P',cursive;font-size:12px;cursor:pointer;margin:15px 4px;width:100%;">🎣 ADQUIRIR (GRÁTIS)</button>
+            <p style="font-size:9px;color:#aaa;margin-bottom:30px;">Use-a para aprender o jogo sem riscos!</p>
+            <button id="claim-training-rod-btn" style="background:linear-gradient(180deg,#44cc44 0%,#2a8a2a 100%);color:white;border:3px solid #1a5a1a;border-radius:12px;padding:16px 20px;font-family:'Press Start 2P',cursive;font-size:12px;cursor:pointer;width:100%;">🎣 ADQUIRIR (GRÁTIS)</button>
         </div>
     </div>
 
@@ -719,7 +720,7 @@
             m._t = setTimeout(() => { m.style.display = 'none'; }, dur);
         }
 
-        // ========== MODAL DE BOAS-VINDAS ==========
+        // ========== MODAL DE BOAS-VINDAS (CORRIGIDO) ==========
         function showWelcomeModal() {
             if (!playerData.ownedRods.includes('training_rod')) {
                 document.getElementById('welcome-modal').style.display = 'flex';
@@ -730,16 +731,18 @@
             document.getElementById('welcome-modal').style.display = 'none';
         }
 
-        document.getElementById('claim-training-rod-btn').addEventListener('click', () => {
-            if (!playerData.ownedRods.includes('training_rod')) {
-                playerData.ownedRods.push('training_rod');
+        document.getElementById('claim-training-rod-btn').addEventListener('click', async () => {
+            try {
+                const data = await buyRod('training_rod');
+                playerData.coins = data.coins;
+                playerData.ownedRods = data.ownedRods;
+                playerData.equippedRod = data.equippedRod;
+                updateUI();
+                hideWelcomeModal();
+                showMessage('🎓 Training Rod equipada! Modo demonstração ativo.', 3000);
+            } catch (e) {
+                showMessage('Erro ao adquirir a Training Rod: ' + e.message, 3000);
             }
-            playerData.equippedRod = 'training_rod';
-            playerData.currentEnergy = 9999;
-            playerData.maxEnergy = 9999;
-            updateUI();
-            hideWelcomeModal();
-            showMessage('🎓 Training Rod equipada! Modo demonstração ativo.', 3000);
         });
 
         // ========== SISTEMA DE PESCA (HARDCORE) ==========
@@ -959,7 +962,7 @@
         const mountainObstacles = [ { pos: new THREE.Vector3(-8, 0, -5), radius: 3.0 }, { pos: new THREE.Vector3(-12, 0, -3), radius: 1.8 }, { pos: new THREE.Vector3(14, 0, -4), radius: 2.0 }, { pos: new THREE.Vector3(9, 0, -6), radius: 5.0 } ];
         function isInsideMountain(x, z) { return mountainObstacles.some(o => Math.sqrt((x-o.pos.x)**2 + (z-o.pos.z)**2) < o.radius); }
 
-        // Texturas e cenário (mantidas exatamente como no original)
+        // ========== TEXTURAS E CENÁRIO (COMPLETO, SEM ALTERAÇÕES) ==========
         function createMountainTexture() {
             const c = document.createElement('canvas'); c.width = 512; c.height = 1024; const ctx = c.getContext('2d');
             const grad = ctx.createLinearGradient(0, 0, 0, 1024);
@@ -1152,7 +1155,6 @@
         const originalBobber = fishingRodGroup.getObjectByName('originalBobber');
         const fishingLine = fishingRodGroup.getObjectByName('fishingLine');
 
-        // Shiny Greninja no deck
         const greninjaTexture = new THREE.TextureLoader().load('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/658.png');
         const greninjaMaterial = new THREE.SpriteMaterial({ map: greninjaTexture, transparent: true });
         const greninjaSprite = new THREE.Sprite(greninjaMaterial);
@@ -1160,7 +1162,6 @@
         greninjaSprite.scale.set(1.5, 1.5, 1);
         scene.add(greninjaSprite);
 
-        // Projétil
         const projectileGroup = new THREE.Group(); projectileGroup.visible = false;
         const projBobberGeo = new THREE.SphereGeometry(0.2, 12, 12); const projBobberMat = new THREE.MeshStandardMaterial({ color: 0xff3333, roughness: 0.25, metalness: 0.15, emissive: 0x440000, emissiveIntensity: 0.6 });
         const projBobber = new THREE.Mesh(projBobberGeo, projBobberMat); projBobber.castShadow = projBobber.receiveShadow = true; projectileGroup.add(projBobber);
@@ -1168,7 +1169,6 @@
         const projLineMat = new THREE.LineBasicMaterial({ color: 0xcccccc }); const projLine = new THREE.Line(projLineGeo, projLineMat); projLine.name = 'projLine'; projectileGroup.add(projLine);
         projectileGroup.name = 'projectile'; scene.add(projectileGroup);
 
-        // Ondulações e Splash
         const rippleRings = []; const maxRipples = 6;
         for (let i = 0; i < maxRipples; i++) {
             const ringGeo = new THREE.TorusGeometry(0.3, 0.06, 8, 24); const ringMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false });
@@ -1198,13 +1198,11 @@
             splashGeo.attributes.position.needsUpdate = true; splashPoints.visible = true; splashActive = true; splashTime = 0;
         }
 
-        // Water fly
         const wfCount = 600; const wfGeo = new THREE.BufferGeometry(); const wfPos = new Float32Array(wfCount * 3); const wfVel = new Float32Array(wfCount); const wfDrift = new Float32Array(wfCount);
         for (let i = 0; i < wfCount; i++) { wfPos[i * 3] = (Math.random() - 0.5) * 2.8; wfPos[i * 3 + 1] = Math.random() * 7 + 2; wfPos[i * 3 + 2] = (Math.random() - 0.5) * 0.6; wfVel[i] = 0.02 + Math.random() * 0.13; wfDrift[i] = 0.01 + Math.random() * 0.05; }
         wfGeo.setAttribute('position', new THREE.BufferAttribute(wfPos, 3)); const wfMat = new THREE.PointsMaterial({ color: 0xc8e8f8, size: 0.14, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.85 });
         const wfPoints = new THREE.Points(wfGeo, wfMat); wfPoints.position.set(0, 5, 0); scene.add(wfPoints);
 
-        // Spray e fumaça
         const sprayCount = 160; const sprayGeo = new THREE.BufferGeometry(); const sprayPositions = new Float32Array(sprayCount * 3); const sprayData = []; const craterWorldPos = new THREE.Vector3(9, 7.3, -6);
         function resetSprayParticle(i, init = false) {
             const a = Math.random() * Math.PI * 2, d = Math.random() * 0.7;
@@ -1276,7 +1274,6 @@
         });
         const smokePoints = new THREE.Points(smokeGeo, smokeShaderMaterial); scene.add(smokePoints);
 
-        // Vento
         const windParticleCount = 600; const windGeo = new THREE.BufferGeometry(); const windPositionsArr = new Float32Array(windParticleCount * 3); const windData = [];
         const windBounds = { minX: -18, maxX: 24, minY: 2, maxY: 12, minZ: -11, maxZ: 10 };
         for (let i = 0; i < windParticleCount; i++) {
@@ -1296,7 +1293,6 @@
         const windMat = new THREE.PointsMaterial({ color: 0xf5faff, size: 0.13, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.25 });
         const windPoints = new THREE.Points(windGeo, windMat); scene.add(windPoints);
 
-        // Rochas
         function createRockCluster(x, z, scale) {
             const g = new THREE.Group();
             const geo = new THREE.DodecahedronGeometry(1, 2);
@@ -1322,7 +1318,6 @@
             else if (!isInsideMountain(x, z)) scene.add(createRockCluster(x, z, 0.3 + Math.random() * 0.7));
         }
 
-        // Pinheiros
         function createPineTree(x, z, hs = 1) {
             const g = new THREE.Group(); const th = 1.4 * hs, tr = 0.15 * hs;
             const tg = new THREE.CylinderGeometry(tr * 0.8, tr, th, 8); const tm = new THREE.MeshStandardMaterial({ color: 0x5D3A1A, roughness: 0.8, metalness: 0.1, flatShading: true });
@@ -1337,7 +1332,6 @@
         for (let i = 0; i < 18; i++) { const a = Math.random()*Math.PI*2, r = 9.6+Math.random()*2.8; const x = Math.cos(a)*r, z = Math.sin(a)*r; if (isValidTreePosition(x,z,treePositions)) { scene.add(createPineTree(x,z,0.9+Math.random()*0.7)); treePositions.push({x,z}); } }
         for (let i = 0; i < 15; i++) { const a = Math.random()*Math.PI*2, r = 12.5+Math.random()*5; const x = Math.cos(a)*r, z = Math.sin(a)*r; if (isValidTreePosition(x,z,treePositions)) { scene.add(createPineTree(x,z,1+Math.random()*0.8)); treePositions.push({x,z}); } }
 
-        // Pokébola
         function createUltraRealisticPokeball() {
             const g = new THREE.Group(); const sg = new THREE.SphereGeometry(1, 64, 64); const sm = new THREE.MeshPhysicalMaterial({ color: 0xF8F8F8, roughness: 0.15, metalness: 0.1, clearcoat: 1, clearcoatRoughness: 0.1 });
             const s = new THREE.Mesh(sg, sm); s.castShadow = s.receiveShadow = true; g.add(s);
@@ -1353,7 +1347,6 @@
         }
         const pokeballGroup = createUltraRealisticPokeball(); pokeballGroup.position.set(0, 0.5, 0); pokeballGroup.scale.set(0.65, 0.65, 0.65); scene.add(pokeballGroup);
 
-        // Lava shader
         const lavaFlowGeo = new THREE.CylinderGeometry(0.72, 4.7, 8.5, 72, 1);
         const lavaFlowMat = new THREE.ShaderMaterial({
             uniforms: { time: { value: 0 }, colorCore: { value: new THREE.Color(0xff3300) }, colorMid: { value: new THREE.Color(0xff6600) }, colorCrust: { value: new THREE.Color(0x1a0a00) } },
@@ -1374,7 +1367,6 @@
         });
         const lavaFlowMesh = new THREE.Mesh(lavaFlowGeo, lavaFlowMat); lavaFlowMesh.position.y = 4.25; lavaFlowMesh.renderOrder = 1; volcanoGroup.add(lavaFlowMesh);
 
-        // Animação
         function startCastAnimation(power) {
             const lakeCenter = new THREE.Vector3(0, -0.8, 0); const deckMinX = -2.9, deckMaxX = 2.9, deckMinZ = -9.6, deckMaxZ = -6;
             let validPosition = false; let tx, tz;
@@ -1482,7 +1474,6 @@
             controls.update(); renderer.render(scene, camera);
         }
 
-        // Inicialização da cena
         updateUI();
         renderer.render(scene, camera);
         requestAnimationFrame(animate);
