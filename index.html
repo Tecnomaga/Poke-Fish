@@ -345,8 +345,8 @@
                     <div style="font-size:9px;color:#ccc;margin-top:4px;">Valor líquido (após 5% de taxa): $<span id="withdraw-amount-usd">0.00</span></div>
                 </div>
                 <div class="form-group">
-                    <label for="withdraw-wallet">Endereço da carteira BSC (BEP-20)</label>
-                    <input type="text" id="withdraw-wallet" placeholder="0x...">
+                    <label for="withdraw-wallet">Endereço da carteira (BSC / Polygon / Tron)</label>
+                    <input type="text" id="withdraw-wallet" placeholder="BSC/Polygon: 0x... | Tron: T...">
                 </div>
                 <div class="withdraw-rules">
                     ⚠️ <strong>Taxa de saque:</strong> 5%<br>
@@ -1024,7 +1024,7 @@
         const mountainObstacles = [ { pos: new THREE.Vector3(-8, 0, -5), radius: 3.0 }, { pos: new THREE.Vector3(-12, 0, -3), radius: 1.8 }, { pos: new THREE.Vector3(14, 0, -4), radius: 2.0 }, { pos: new THREE.Vector3(9, 0, -6), radius: 5.0 } ];
         function isInsideMountain(x, z) { return mountainObstacles.some(o => Math.sqrt((x-o.pos.x)**2 + (z-o.pos.z)**2) < o.radius); }
 
-        // ========== TEXTURAS E CENÁRIO (COMPLETO, SEM ALTERAÇÕES) ==========
+        // ========== TEXTURAS E CENÁRIO (COMPLETO) ==========
         function createMountainTexture() {
             const c = document.createElement('canvas'); c.width = 512; c.height = 1024; const ctx = c.getContext('2d');
             const grad = ctx.createLinearGradient(0, 0, 0, 1024);
@@ -1643,7 +1643,16 @@
         document.getElementById('submit-withdraw-btn').addEventListener('click', async () => {
             const amount = parseInt(document.getElementById('withdraw-amount').value);
             const wallet = document.getElementById('withdraw-wallet').value.trim();
-            if (!wallet || !/^0x[a-fA-F0-9]{40}$/.test(wallet)) { document.getElementById('withdraw-msg').textContent = 'Carteira BSC inválida.'; return; }
+            // Validação flexível (BSC, Polygon, Tron)
+            const isValidWallet = (w) => {
+                if (/^0x[a-fA-F0-9]{40}$/.test(w)) return true;      // BSC / Polygon
+                if (/^T[A-Za-z1-9]{25,33}$/.test(w)) return true;    // Tron
+                return false;
+            };
+            if (!isValidWallet(wallet)) { 
+                document.getElementById('withdraw-msg').textContent = 'Carteira inválida. Use BSC/Polygon (0x...) ou Tron (T...).'; 
+                return; 
+            }
             if (!amount || amount < 3000) { document.getElementById('withdraw-msg').textContent = 'Mínimo de 3000 moedas.'; return; }
             const btn = document.getElementById('submit-withdraw-btn'); btn.disabled = true; btn.textContent = 'Enviando...';
             try {
