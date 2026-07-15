@@ -351,7 +351,8 @@
                 <div class="withdraw-rules">
                     ⚠️ <strong>Taxa de saque:</strong> 5%<br>
                     💰 <strong>Saque mínimo:</strong> 30 USDT (≈ 3000 moedas)<br>
-                    🔄 <strong>Limite:</strong> 2 saques por dia
+                    🔄 <strong>Limite:</strong> 2 saques por dia<br>
+                    🕒 <strong>Horário:</strong> 07:00 às 22:00 (horário de Brasília)
                 </div>
                 <button id="submit-withdraw-btn">SOLICITAR SAQUE</button>
                 <div id="withdraw-msg" style="font-size:9px; color:#ff6b6b; min-height:16px; margin-top:6px;"></div>
@@ -1643,10 +1644,9 @@
         document.getElementById('submit-withdraw-btn').addEventListener('click', async () => {
             const amount = parseInt(document.getElementById('withdraw-amount').value);
             const wallet = document.getElementById('withdraw-wallet').value.trim();
-            // Validação flexível (BSC, Polygon, Tron)
             const isValidWallet = (w) => {
-                if (/^0x[a-fA-F0-9]{40}$/.test(w)) return true;      // BSC / Polygon
-                if (/^T[A-Za-z1-9]{25,33}$/.test(w)) return true;    // Tron
+                if (/^0x[a-fA-F0-9]{40}$/.test(w)) return true;
+                if (/^T[A-Za-z1-9]{25,33}$/.test(w)) return true;
                 return false;
             };
             if (!isValidWallet(wallet)) { 
@@ -1704,8 +1704,8 @@
             if (!selectedPackage) { document.getElementById('crypto-msg').textContent = 'Nenhum pacote selecionado.'; return; }
             const txid = document.getElementById('txid-input').value.trim();
             const isValidDepositId = (id) => {
-                if (/^0x[a-fA-F0-9]{64}$/.test(id)) return true;   // BSC
-                if (/^[a-zA-Z0-9]{10,}$/.test(id)) return true;   // Off‑chain
+                if (/^0x[a-fA-F0-9]{64}$/.test(id)) return true;
+                if (/^[a-zA-Z0-9]{10,}$/.test(id)) return true;
                 return false;
             };
             if (!isValidDepositId(txid)) {
